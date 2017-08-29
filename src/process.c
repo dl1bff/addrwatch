@@ -64,13 +64,16 @@ void process_na(struct pkt *p)
 {
 	p->ip_len = IP6_LEN;
 
+	p->ip_addr = (uint8_t *) &p->na->nd_na_target;
+	p->origin = ND_NA;
+
 	if (p->opt_tlla) {
 		p->l2_addr = (uint8_t *)(p->opt_tlla + 1);
-		p->ip_addr = (uint8_t *) &p->na->nd_na_target;
-		p->origin = ND_NA;
-		save_pairing(p);
-		return;
+	} else {
+		p->l2_addr = p->ether->ether_shost;
 	}
+
+	save_pairing(p);
 }
 
 void process_ra(struct pkt *p)

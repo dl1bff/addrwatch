@@ -42,30 +42,39 @@ int parse_nd(struct pkt *p)
 		return -2;
 	}
 
+	int header_size = 0;
+
 	if (p->icmp6->icmp6_type == ND_NEIGHBOR_SOLICIT) {
 		ns = (struct nd_neighbor_solicit *) p->pos;
 		p->ns = ns;
+		header_size = sizeof(struct nd_neighbor_solicit);
 	} else if (p->icmp6->icmp6_type == ND_NEIGHBOR_ADVERT) {
 		na = (struct nd_neighbor_advert *) p->pos;
 		p->na = na;
+		header_size = sizeof(struct nd_neighbor_advert);
 	} else if (p->icmp6->icmp6_type == ND_ROUTER_ADVERT) {
 		ra = (struct nd_router_advert *) p->pos;
 		p->ra = ra;
+		header_size = sizeof(struct nd_router_advert);
 	} else {
 		return -1;
 	}
 
-	p->pos += sizeof(struct nd_neighbor_solicit);
-	p->len -= sizeof(struct nd_neighbor_solicit);
+	p->pos += header_size;
+	p->len -= header_size;
 
 	while (1) {
 		if (p->len < sizeof(struct nd_opt_hdr))
 			break;
 
 		opt = (struct nd_opt_hdr *)p->pos;
+
+		if ((opt->nd_opt_len == 0) && (p->icmp6->icmp6_type == ND_NEIGHBOR_ADVERT))
+			break;  // fix me:  some NA packets have additional zero bytes at the end...
 		
 		if (opt->nd_opt_len == 0) {
-			log_msg(LOG_WARNING, "%s: Error parsing ICMPv6 ND options. Option length is 0.", p->ifc->name);
+			log_msg(LOG_WARNING, "%s: Error parsing ICMPv6 ND options. Option length is 0. Type=%d Option-Type=%d caplen=%d",
+				 p->ifc->name, p->icmp6->icmp6_type, opt->nd_opt_type, p->pcap_header->caplen);
 			return -2;
 		}
 
