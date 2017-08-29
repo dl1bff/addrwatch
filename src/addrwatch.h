@@ -103,8 +103,10 @@ struct pkt {
 	struct icmp6_hdr *icmp6;
 	struct nd_neighbor_solicit *ns;
 	struct nd_neighbor_advert *na;
+	struct nd_router_advert *ra;
 	struct nd_opt_hdr *opt_slla;
 	struct nd_opt_hdr *opt_tlla;
+	struct nd_opt_prefix_info  *opt_ra_pi;
 
 	uint8_t         *l2_addr;
 	uint8_t         *ip_addr;

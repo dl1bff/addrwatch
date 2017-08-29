@@ -34,6 +34,7 @@ int parse_nd(struct pkt *p)
 {
 	struct nd_neighbor_solicit	*ns;
 	struct nd_neighbor_advert	*na;
+	struct nd_router_advert		*ra;
 	struct nd_opt_hdr	*opt;
 
 	if (p->len < sizeof(struct nd_neighbor_solicit)) {
@@ -47,6 +48,9 @@ int parse_nd(struct pkt *p)
 	} else if (p->icmp6->icmp6_type == ND_NEIGHBOR_ADVERT) {
 		na = (struct nd_neighbor_advert *) p->pos;
 		p->na = na;
+	} else if (p->icmp6->icmp6_type == ND_ROUTER_ADVERT) {
+		ra = (struct nd_router_advert *) p->pos;
+		p->ra = ra;
 	} else {
 		return -1;
 	}
@@ -78,6 +82,9 @@ int parse_nd(struct pkt *p)
 			break;
 		case ND_OPT_TARGET_LINKADDR:
 			p->opt_tlla = opt;
+			break;
+		case ND_OPT_PREFIX_INFORMATION:
+			p->opt_ra_pi = (struct nd_opt_prefix_info *) opt;
 			break;
 		default:
 			break;
@@ -148,6 +155,7 @@ int parse_ipv6(struct pkt *p)
 	switch(icmp6->icmp6_type) {
 	case ND_NEIGHBOR_SOLICIT:
 	case ND_NEIGHBOR_ADVERT:
+	case ND_ROUTER_ADVERT:
 		rc = parse_nd(p);
 		break;
 	default:

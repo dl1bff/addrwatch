@@ -5,4 +5,5 @@
 int check_arp(struct pkt *p);
 int check_ns(struct pkt *p);
 int check_na(struct pkt *p);
+int check_ra(struct pkt *p);
 

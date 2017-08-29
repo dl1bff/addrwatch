@@ -13,6 +13,7 @@ enum pkt_origin {
 	ND_NS,
 	ND_NA,
 	ND_DAD,
+	ND_RA,
 };
 
 static inline void ether_ntoa_m(uint8_t addr[], char *str)

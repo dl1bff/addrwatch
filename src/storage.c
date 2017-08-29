@@ -17,6 +17,7 @@ const char *pkt_origin_str[] = {
 	"ND_NS",
 	"ND_NA",
 	"ND_DAD",
+	"ND_RA",
 };
 
 void blacklist_add(char *ip_str)

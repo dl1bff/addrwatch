@@ -73,3 +73,16 @@ void process_na(struct pkt *p)
 	}
 }
 
+void process_ra(struct pkt *p)
+{
+	p->ip_len = IP6_LEN;
+	p->l2_addr = p->ether->ether_shost;
+	p->origin = ND_RA;
+
+	if (p->opt_ra_pi) {
+		p->ip_addr = (uint8_t *) &p->opt_ra_pi->nd_opt_pi_prefix;
+		save_pairing(p);
+		return;
+	}
+}
+

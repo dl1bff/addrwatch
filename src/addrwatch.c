@@ -186,6 +186,9 @@ void pcap_callback(uint8_t *args, const struct pcap_pkthdr *header, const uint8_
 	} else if (p.na) {
 		if (!check_na(&p))
 			process_na(&p);
+	} else if (p.ra) {
+		if (!check_ra(&p))
+			process_ra(&p);
 	}
 
 }

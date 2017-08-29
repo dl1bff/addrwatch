@@ -15,6 +15,7 @@ const char *pkt_origin_str[] = {
 	"ND_NS",
 	"ND_NA",
 	"ND_DAD",
+	"ND_RA",
 	NULL
 };
 
@@ -25,6 +26,7 @@ const char *pkt_origin_desc[] = {
 	"Neighbor Solicitation packet",
 	"Neighbor Advertisement packet",
 	"Duplicate Address Detection packet",
+	"Router Advertisement packet",
 	NULL
 };
 
@@ -43,6 +45,8 @@ static inline char *origin_to_string(uint8_t origin)
 			return "ND_NA";
 		case ND_DAD:
 			return "ND_DAD";
+		case ND_RA:
+			return "ND_RA";
 	}
 	return NULL;
 }

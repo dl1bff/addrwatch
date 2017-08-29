@@ -152,3 +152,60 @@ int check_na(struct pkt *p)
 
 	return rc;
 }
+
+
+int check_ra(struct pkt *p)
+{
+	struct nd_router_advert *ra;
+	struct ip6_hdr *ip6;
+	char ip6_addr[INET6_ADDRSTRLEN];
+	char *pkt_dump;
+	int rc;
+
+	ra = p->ra;
+	ip6 = p->ip6;
+	rc = 0;
+
+	if (ip6->ip6_hlim != 255) {
+		pkt_dump = base64_encode_packet(p);
+		log_msg(LOG_WARNING, "%s: Malformed ICMPv6 NA packet. IPv6 Hop Limit is not 255. Packet dump: %s",
+			p->ifc->name, pkt_dump);
+		rc = -1;
+	}
+
+	if (p->icmp6->icmp6_code != 0) {
+		pkt_dump = base64_encode_packet(p);
+		log_msg(LOG_WARNING, "%s: Malformed ICMPv6 NA packet. ICMPv6 Code is not 0. Packet dump: %s",
+			p->ifc->name, pkt_dump);
+		rc = -1;
+	}
+
+/*
+	if (IN6_IS_ADDR_MULTICAST(&na->nd_na_target)) {
+		ip6_ntoa((uint8_t *) &na->nd_na_target, ip6_addr);
+		pkt_dump = base64_encode_packet(p);
+		log_msg(LOG_WARNING, "%s: Malformed ICMPv6 NA packet. Target address is multicast (%s). Packet dump: %s",
+			p->ifc->name, ip6_addr, pkt_dump);
+		rc = -1;
+	}
+
+	if (IN6_IS_ADDR_MULTICAST(&ip6->ip6_dst) 
+		&& na->nd_na_flags_reserved & ND_NA_FLAG_SOLICITED) {
+		pkt_dump = base64_encode_packet(p);
+		log_msg(LOG_WARNING, "%s: Malformed ICMPv6 NA packet. Dst IP is multicast address, but Solicited flag is set. Packet dump: %s",
+			p->ifc->name, pkt_dump);
+		rc = -1;
+	}
+*/
+
+	if (p->opt_ra_pi == NULL) 
+	{
+		pkt_dump = base64_encode_packet(p);
+		log_msg(LOG_WARNING, "%s: Malformed ICMPv6 RA packet. No Prefix Info Option. Packet dump: %s",
+			p->ifc->name, pkt_dump);
+		rc = -1;
+		
+	}
+
+	return rc;
+}
